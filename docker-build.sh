@@ -1,1 +1,1 @@
-docker build -t tk4 .
+docker build -t tk4:latest .
