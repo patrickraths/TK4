@@ -18,7 +18,7 @@ ENV HERCULES /opt/hercules
 # Install required packages
 #
 RUN apt-get -y update
-RUN apt-get -y install apt-utils wget time htop
+RUN apt-get -y install apt-utils wget time htop nano
 RUN apt-get -y install libcap2-bin
 #
 # Copy TK4- and Hercules 
