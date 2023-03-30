@@ -49,15 +49,11 @@ available in subfolder ctca_demo of the tk4- folder.
 It contains the following files:
 
 README.txt                 - this file
-sos-1                     \
-sos-1.bat                  \ startup scripts for
-sos-2                      / Windows and *i*x systems
-sos-2.bat                 /
+sos-1                      \ startup scripts /
+sos-2                      /                 \
 conf/sos.cnf               - Hercules configuration file
 herclogo.txt               - welcome screen for 3270 terminals
 hercules.rc                - script to IPL the Sample Operating System
-logo/sos3270.ai            - SOS graphics logo "source" (Adobe Illustrator)
-logo/sos3270.bmp           - Windows bitmap file of SOS graphics logo 
 logo/sos3270.pss           - LPS datastream to display logo on 3270 devices
 rdr/clear_console.deck     - utility program to clear console interrupts
 rdr/ctca_demo.deck         - channel to channel adaptor demo program

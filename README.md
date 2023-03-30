@@ -48,7 +48,8 @@ The following changes are requied to run TK4- with SDL Hercules 4.5
 Building the container is controlled through the Dockerfile found in the root directory of this repository. To access the system using a 3270 Terminal Emulator as well as the SDL Hercules Web-Interface ports 3270 and 8038 must be made available on the host.
 
 - Build the image using `docker build -t tk4:latest .` This creates a new image called ***TK4***
-- Run the container using `docker run --name tk4 -it -p 3270:3270 -p 8038:8038 tk4` This creates a new container named ***tk4*** based on the previously created image, exposes ports 3270 and 8038 to the host and starts Hercules with MVS 3.8j
+- Create a volume called tk4-dasd. This volume can be used to store per
+- Run the container using `docker run --name tk4 -it --mount src=tk4-dasd,target=/opt/tk4/dasd.usr -p 3270:3270 -p 8038:8038 tk4:latest` This creates a new container named ***tk4*** based on the previously created image, exposes ports 3270 and 8038 to the host and starts Hercules with MVS 3.8j
 
 <img width="570" alt="TK4 Console" src="https://user-images.githubusercontent.com/43680256/227548975-a5a90c92-13dc-48e7-93d6-0ab0f453cb63.png">
 

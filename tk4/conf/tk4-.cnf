@@ -8,7 +8,7 @@
 #***                                                                ***
 #**********************************************************************
 CPUSERIAL 000611
-CPUMODEL 3033
+CPUMODEL 3084
 MAINSIZE ${MAINSIZE:=16}
 XPNDSIZE 0
 CNSLPORT ${CNSLPORT:=3270}
@@ -116,3 +116,7 @@ INCLUDE conf/tk4-_updates.cnf
 # local updates
 #
 ${LOCALCNF:=INCLUDE conf/local.cnf}
+#
+# Add-on DASD
+#
+INCLUDE dasd.usr/usr_dasd.cnf
