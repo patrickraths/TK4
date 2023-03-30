@@ -24,9 +24,9 @@ The following changes are requied to run TK4- with SDL Hercules 4.5
 #### Change log of modification to TK4-
 | File/Directory | Changes |
 | :--- | :--- |
-| [conf] | no changes |
+| [conf] | Modifed tk4-.cnf to add support for user added DASD stored in Docker Volume and mounted as ./dasd.usr |
 | [ctca_demon] | no changes |
-| [dasd] | no changes |
+| [dasd] | Added TK4- CBT DASD |
 | [doc] | Directory removed |
 | [hercules] | All files removed, but directory retained as it is reference in the configuration files for the hercules monitoring web interface. Sumbolic link for httproot subdirectory inside this directory will be created to access SDL Hercules 4.5 monitoring web interface. |
 | [jcl] | no changes |
@@ -48,7 +48,7 @@ The following changes are requied to run TK4- with SDL Hercules 4.5
 Building the container is controlled through the Dockerfile found in the root directory of this repository. To access the system using a 3270 Terminal Emulator as well as the SDL Hercules Web-Interface ports 3270 and 8038 must be made available on the host.
 
 - Build the image using `docker build -t tk4:latest .` This creates a new image called ***TK4***
-- Create a volume called tk4-dasd. This volume can be used to store per
+- Create a volume called tk4-dasd. This volume can be used to store persistent dasd files.
 - Run the container using `docker run --name tk4 -it --mount src=tk4-dasd,target=/opt/tk4/dasd.usr -p 3270:3270 -p 8038:8038 tk4:latest` This creates a new container named ***tk4*** based on the previously created image, exposes ports 3270 and 8038 to the host and starts Hercules with MVS 3.8j
 
 <img width="570" alt="TK4 Console" src="https://user-images.githubusercontent.com/43680256/227548975-a5a90c92-13dc-48e7-93d6-0ab0f453cb63.png">
