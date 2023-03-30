@@ -58,3 +58,13 @@ When starting the container MVS 3.8j is automatically started using the mvs star
 ```
 docker start -i tk4
 ```
+
+
+## Customizing TK4-
+
+### Changing the Timezone
+To change the timezone modify ***SYS1.PARMLIB(PARMTZ)
+<img width="1120" alt="image" src="https://user-images.githubusercontent.com/43680256/228867399-c9d08e02-9851-4f09-939c-f7aff5a65d82.png">
+
+### Enabling the CBT Catalogue
+
