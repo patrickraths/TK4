@@ -96,37 +96,98 @@ There are different DASD types that vary in capacity; typical models as 3330, 33
 MVS communicates to DASD devices through addresses. TK4- has assigned the following address ranges for DASD devices:
 <img width="640" alt="image" src="https://user-images.githubusercontent.com/43680256/229289077-eb87138d-e61f-4190-968b-8ba2e0680f48.png">
 
-Please note that for the model 3350 the following Addresses are already in use:
+In TK4- the following addresses for DASD Model 3350 are in use:
 | Address | Volume |
 | :------ | :----- |
 | 0140 | WORK00 |
 | 0148 | MVSRES |
-| 0149 | SMP001 |
-| 014A | SMP002 |
-| 014B | SMP003 |
-| 014C | SMP004 |
-| 0240 | PUB000 |
-| 0241 | PUB010 |
+| 0149-014A | SMP001, SMP002 |
+| 014B-014C | SMP003, SMP004 |
+| 0240-0241 | PUB000, PUB010 |
 | 0248 | MVSDLB |
-| 0340 | CBT000 |
-| 0341 | CBT001 |
-| 0342 | CBT002 |
+| 0340-0342 | CBT000, CBT001, CBT002 |
 | 0343 | CBTCAT |
 
-
-
-
-
+For the actual use of addresses refer to the **conf/tk4-.cnf** file
 
 1. Create DASD Image<br>
-   To create the DASD image, you will need to execute the dasdinit program in the terminal window. The dasdinit executable is included in the Hercules distribution package
+   For our purpose we want to create the following volume to store user data:
+   | Address | Model | Volume |
+   | :------ | :---- | :----- |
+   | 034A | 3350 | USR000 |
+   
+   To create the DASD image, you will need to execute the dasdinit program in the terminal window. 
+   
    ```
-   /opt/hercules/bin/dasdinit -z -a /opt/tk4/dasd.usr/usr000.242 3350 USR000
+   /opt/hercules/bin/dasdinit -z -a /opt/tk4/dasd.usr/usr000.34a 3350 USR000
    ````
    >HHC02499I Hercules utility dasdinit - DASD image file creation program - version 4.5.0.10830-SDL-g58578601-modified<br>
    >HHC01414I (C) Copyright 1999-2022 by Roger Bowler, Jan Jaeger, and others<br>
    >HHC01417I ** The SoftDevLabs version of Hercules **<br>
-   >HHC01415I Build date: Mar 28 2023 at 10:51:26<br
-   >HHC00462I 0:0000 CKD file /opt/tk4/dasd.usr/usr000.242: creating 3350 volume USR000: 560 cyls, 30 trks/cyl, 19456 bytes/track
-   >HHC00460I 0:0000 CKD file /opt/tk4/dasd.usr/usr000.242: 560 cylinders successfully written<br>
+   >HHC01415I Build date: Mar 28 2023 at 10:51:26<br>
+   >HHC00462I 0:0000 CKD file /opt/tk4/dasd.usr/usr000.34a: creating 3350 volume USR000: 560 cyls, 30 trks/cyl, 19456 bytes/track<br>
+   >HHC00460I 0:0000 CKD file /opt/tk4/dasd.usr/usr000.34a: 560 cylinders successfully written<br>
    >HHC02423I DASD operation completed<br>
+
+2. Attach the newly creased DASD<br>
+   In order to attach an emulated device to Hercules while it is running, you will need to be in the text console display because there is no equivalent command in the graphical display.  The command syntax is:
+
+   `attach <address> <devtype> <filename> [cu=3880]`
+
+   To attach the previously created dasd use the following command in the MVS console:
+   ```
+   attach 034a 3350 dasd.usr/usr000.34a
+   ```
+   <img width="569" alt="image" src="https://user-images.githubusercontent.com/43680256/229291338-b4438109-14fa-4a1e-a3f8-041459a4ef02.png">
+   
+3. Initalize the DASD Image for use by MVS
+   Although the dasdinit program creates the raw DASD image, MVS requires additional information that is not written by dasdinit. The following JCL initalizes newly created DASD as Volume **USR000** using address **34A**, and assigns 1 Cylinder (30 Tracks) for the VTOC.
+   
+   ```
+   //ICKDSF  JOB (1),ICKDSF,CLASS=A,MSGCLASS=H
+   //ICKDSF EXEC PGM=ICKDSF,REGION=4096K
+   //SYSPRINT DD  SYSOUT=*
+   //SYSIN    DD  *
+   INIT UNITADDRESS(34A) NOVERIFY VOLID(USR000) OWNER(HERCULES) -
+                VTOC(0,1,30)
+   /*
+   //
+   ```
+   
+   You will be asked to confirm that you actually want to initialize the volume at the address specified:
+   >*00 ICK003D REPLY U TO ALTER VOLUME 34A CONTENTS, ELSE T
+
+   The reply of U allows the initialization to proceed.  There will be a number of informational messages printed in the SYSPRINT output during the executing of ICKDSF.  The most important thing to verify is that the return code for the job is 0000.
+   
+   <img width="564" alt="image" src="https://user-images.githubusercontent.com/43680256/229292813-f8b2b471-e8b8-4bad-ae3c-8aabebefaf3b.png">
+
+4. Set the volume online and mount it with the appropriate storage use class<br>
+   After the volume is initialized, it must be placed online before MVS will be able to allocate the volume to allow jobs to create datasets on it.  On the MVS console issue the command `v <address>,online`
+   
+   <img width="566" alt="image" src="https://user-images.githubusercontent.com/43680256/229293847-bbf79122-eec8-4ea6-b7eb-0a6f9cd8faa3.png">
+
+   After the volume is set online it must be mounted.
+   ```
+   /m 34a,vol=(sl,usr000),use=private
+   ```
+   <img width="563" alt="image" src="https://user-images.githubusercontent.com/43680256/229294052-0bf92643-5ae9-4a40-b6b0-e710d8375f1d.png">
+   
+   By using use=private new datasets will be created on this volume only if the user (via JCL or the TSO ALLOCATE command) specifies the volume serial of this disk volume.
+   
+5. Add the new volume to the MVS & Hercules configuration so it will be mounted automatically
+   - Edit MVS Configuration<br>
+     By modifying **SYS1.PARMLIB(VATLST00)** MVS will be instructed to automatically mount the volume, if accessible, and assign storage class 2 (Private)
+     ```
+     USR000,0,2,3350    ,N                  User Volume 1 
+     ```
+     <img width="636" alt="image" src="https://user-images.githubusercontent.com/43680256/229294781-e78fd5d8-e0f8-4d2e-8155-c4d65568ddcf.png">
+
+   - Edit Hercules Configuration<br>
+     Modify the file /opt/tk4/dasd.usr/usr_dasd.cnf to automatically attach the newly created dasd at address 34a. This file is referenced as include in the TK4- base configuration file (/opt/tk4/conf/tk4-.cnf)
+     ```
+     #
+     # User Added DASD
+     #
+     034a 3350 dasd.usr/usr000.34a
+     ```
+
