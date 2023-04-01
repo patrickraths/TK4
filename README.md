@@ -87,5 +87,46 @@ Change MSGCLASS from 'A' to 'H' so that the result of the job can be viewed
 
 <img width="585" alt="image" src="https://user-images.githubusercontent.com/43680256/229275001-82b5c4a7-8b9e-4284-83f3-9deddf85ce1c.png">
 
-### Creating and cataloging user DASD
+### Creating, cataloging, and using user DASD
+It is recommended to create a separate DASD (Direct Access Storage Device) to store data on MVS that is not part of the TK4- standard configuration. By default all DASD are stored in [dasd] directory inside the TK4 folder structure. However, since the storage inside a docker container is not persistent, user DASD should be placed into the folder [dasd.usr] that is mounted as docker volume. 
 
+#### Creating and catagoling a new DASD
+There are different DASD types that vary in capacity; typical models as 3330, 3340, 3350, 3380, 3390, etc. However, TK4- odes not support DASD models after 3350, thus we will be using the model 3350 which provides a capacity of approximately 300MB.
+
+MVS communicates to DASD devices through addresses. TK4- has assigned the following address ranges for DASD devices:
+<img width="640" alt="image" src="https://user-images.githubusercontent.com/43680256/229289077-eb87138d-e61f-4190-968b-8ba2e0680f48.png">
+
+Please note that for the model 3350 the following Addresses are already in use:
+| Address | Volume |
+| :------ | :----- |
+| 0140 | WORK00 |
+| 0148 | MVSRES |
+| 0149 | SMP001 |
+| 014A | SMP002 |
+| 014B | SMP003 |
+| 014C | SMP004 |
+| 0240 | PUB000 |
+| 0241 | PUB010 |
+| 0248 | MVSDLB |
+| 0340 | CBT000 |
+| 0341 | CBT001 |
+| 0342 | CBT002 |
+| 0343 | CBTCAT |
+
+
+
+
+
+
+1. Create DASD Image<br>
+   To create the DASD image, you will need to execute the dasdinit program in the terminal window. The dasdinit executable is included in the Hercules distribution package
+   ```
+   /opt/hercules/bin/dasdinit -z -a /opt/tk4/dasd.usr/usr000.242 3350 USR000
+   ````
+   >HHC02499I Hercules utility dasdinit - DASD image file creation program - version 4.5.0.10830-SDL-g58578601-modified<br>
+   >HHC01414I (C) Copyright 1999-2022 by Roger Bowler, Jan Jaeger, and others<br>
+   >HHC01417I ** The SoftDevLabs version of Hercules **<br>
+   >HHC01415I Build date: Mar 28 2023 at 10:51:26<br
+   >HHC00462I 0:0000 CKD file /opt/tk4/dasd.usr/usr000.242: creating 3350 volume USR000: 560 cyls, 30 trks/cyl, 19456 bytes/track
+   >HHC00460I 0:0000 CKD file /opt/tk4/dasd.usr/usr000.242: 560 cylinders successfully written<br>
+   >HHC02423I DASD operation completed<br>
