@@ -1,10 +1,10 @@
 # MVS TK4- running in Docker container on AARCH64
-This repository contains all required files to build and run a docker container running ***TK4-, Update 8*** 
+This repository contains all required files to build and run a docker container running **TK4-, Update 8** 
 
 ## Components
 Running TK4- Update 8 in a docker container requires serveral updates to the default configuration supplied as part of the default installation of TK4- as available on https://github.com/patrickraths/sdl-hercules-390-aarch64.git
 
-Both components, ***SDL Hercules*** and ***TK4-*** will be installed into the following directories:
+Both components, **SDL Hercules** and **TK4-** will be installed into the following directories:
 - /opt/hercules
 - /opt/tk4-
 
@@ -47,9 +47,9 @@ The following changes are requied to run TK4- with SDL Hercules 4.5
 ## Building the Docker image and running it as container
 Building the container is controlled through the Dockerfile found in the root directory of this repository. To access the system using a 3270 Terminal Emulator as well as the SDL Hercules Web-Interface ports 3270 and 8038 must be made available on the host.
 
-- Build the image using `docker build -t tk4:latest .` This creates a new image called ***TK4***
+- Build the image using `docker build -t tk4:latest .` This creates a new image called **TK4**
 - Create a volume called tk4-dasd. This volume can be used to store persistent dasd files.
-- Run the container using `docker run --name tk4 -it --mount src=tk4-dasd,target=/opt/tk4/dasd.usr -p 3270:3270 -p 8038:8038 tk4:latest` This creates a new container named ***tk4*** based on the previously created image, exposes ports 3270 and 8038 to the host and starts Hercules with MVS 3.8j
+- Run the container using `docker run --name tk4 -it --mount src=tk4-dasd,target=/opt/tk4/dasd.usr -p 3270:3270 -p 8038:8038 tk4:latest` This creates a new container named **tk4** based on the previously created image, exposes ports 3270 and 8038 to the host and starts Hercules with MVS 3.8j
 
 <img width="570" alt="TK4 Console" src="https://user-images.githubusercontent.com/43680256/227548975-a5a90c92-13dc-48e7-93d6-0ab0f453cb63.png">
 
@@ -63,8 +63,29 @@ docker start -i tk4
 ## Customizing TK4-
 
 ### Changing the Timezone
-To change the timezone modify ***SYS1.PARMLIB(PARMTZ)
+To change the timezone modify **SYS1.PARMLIB(PARMTZ)**
+
+*†Syntax*<br>
+The member consists of one record
+The member uses the syntax  D,HH[.MM[.SS]]
+
+*Parameters*<br>
+D is either "E" or "W" to specify a time zone east or west or Greenwich Mean Time (GMT)
+HH specifies the number of hours deviation from GMT (00-12)
+MM specifies the number of minutes. Optional parameter. (00-59)
+SS specifies the number of seconds. Optional parameter (00-59)
+
 <img width="1120" alt="image" src="https://user-images.githubusercontent.com/43680256/228867399-c9d08e02-9851-4f09-939c-f7aff5a65d82.png">
 
 ### Enabling the CBT Catalogue
+To make the CBT Volumes **CBTCAT**, **CBT000**, **CBT001**, **CBT002** accessible through catalog search the respective user catalogs need to be connected and the high level qualifer aliases pointing to them need to be defined. 
+
+To make the CBT Volumes accessibles submit job **SYS1.SETUP.CNTL(MVS0170) [issue **sub** on the Command line when viewing/editing the dataset]. This connects the SYS1.UCAT.CBT user catalog and defines the CBT, CBTCOV, CBT072, CBT129, CBT249, CBT429 HLQ aliases.
+
+Recommendation:<br>
+Change MSGCLASS from 'A' to 'H' so that the result of the job can be viewed
+
+<img width="585" alt="image" src="https://user-images.githubusercontent.com/43680256/229275001-82b5c4a7-8b9e-4284-83f3-9deddf85ce1c.png">
+
+### Creating and cataloging user DASD
 
