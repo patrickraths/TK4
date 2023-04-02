@@ -191,3 +191,56 @@ For the actual use of addresses refer to the **conf/tk4-.cnf** file
      034a 3350 dasd.usr/usr000.34a
      ```
 
+6. Set Up User Catalogs<br>
+   Generally, when adding new storage space to the system, it is also a good time to think about how that storage space will integrate with the catalog structure in place for the system.
+
+   During System Generation, a VSAM Master Catalog was created. It resides on MVSRES and the dataset name of the catalog itself is SYS1.VSAM.MASTER.CATALOG. Although any new datasets you created can be catalogued in the Master Catalog, it is not considered a good practice and would undoubtedly not be allowed in any real world shop.
+   
+   To create a User catalog called **UCUSR000** that resides on the new volume **USR000** that will be connected to the master catalog, submit the following JCL:
+
+   ```
+   //DEFUCAT JOB (*),CLASS=A,MSGLEVEL=(1,1),MSGCLASS=H              
+   //DEFUCAT EXEC PGM=IDCAMS,REGION=4096K                           
+   //SYSPRINT DD SYSOUT=*                                           
+   //USR000 DD UNIT=3350,VOL=SER=USR000,DISP=OLD                    
+   //SYSIN DD *                                                     
+                                                                 
+     /* THIS USER CATALOG WILL CONTAIN NON-VSAM DATASETS THAT     */
+     /* RESIDE ON VOLUME USR000.                                  */
+                                                                 
+     DEFINE USERCATALOG ( -                                         
+            NAME (UCUSR000) -                                       
+            VOLUME (USR000) -                                       
+            CYLINDERS (20) -                                        
+            FOR (9999) -                                            
+            BUFFERSPACE (8192) )                                    
+                                                                 
+     /* AN ALIAS IS DEFINED SO THAT ALL DATASETS WITH A HIGH-     */
+     /* LEVEL QUALIFIER OF PUB000 WILL BE CATALOGUED IN THE       */
+     /* USER CATALOG UCUSR000.                                    */
+                                                                 
+     DEFINE ALIAS ( -
+            NAME (USR000) -      
+            RELATE (UCUSR000) )
+   /*
+   //
+   ```                                              
+   When a volume is brought into the system from a prior functioning system that has its own User Catalog on the volume, the following JCL is used to import that catalog and set up Aliases to it:
+
+   ```
+   //ADDUCCAT JOB (*),CLASS=S,MSGCLASS=H
+   //ADDUCCAT EXEC PGM=IDCAMS,REGION=4096K
+   //SYSPRINT DD  SYSOUT=*
+   //SYSP01   DD  UNIT=3350,DISP=OLD,VOL=SER=USR000
+   //SYSIN DD *
+
+     /* THERE IS A USER CATALOG IN EXISTENCE ON SYSP01 THAT       */
+     /* CONTAINS CATALOG ENTRIES FOR THE DATASETS ON THAT VOLUME. */
+     /* IT IS CONNECTED TO THE MASTER CATALOG AND AN ALIAS IS     */
+     /* DEFINED TO RELATE FUTURE DATASETS REFERENCES TO IT.       */
+
+     IMPORT CONNECT OBJECTS((UCUSR000 VOLUME(UCUSR000) DEVT(3350)))
+     DEFINE ALIAS(NAME(USR000) RELATE(UCUSR000))
+
+   //
+   ```
