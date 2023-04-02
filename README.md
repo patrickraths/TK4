@@ -228,8 +228,8 @@ For the actual use of addresses refer to the **conf/tk4-.cnf** file
    When a volume is brought into the system from a prior functioning system that has its own User Catalog on the volume, the following JCL is used to import that catalog and set up Aliases to it:
 
    ```
-   //ADDUCCAT JOB (*),CLASS=S,MSGCLASS=H
-   //ADDUCCAT EXEC PGM=IDCAMS,REGION=4096K
+   //ADDUCAT JOB (*),CLASS=S,MSGCLASS=H
+   //ADDUCAT EXEC PGM=IDCAMS,REGION=4096K
    //SYSPRINT DD  SYSOUT=*
    //SYSP01   DD  UNIT=3350,DISP=OLD,VOL=SER=USR000
    //SYSIN DD *
