@@ -90,7 +90,7 @@ Change MSGCLASS from 'A' to 'H' so that the result of the job can be viewed
 ### Creating, cataloging, and using user DASD
 It is recommended to create a separate DASD (Direct Access Storage Device) to store data on MVS that is not part of the TK4- standard configuration. By default all DASD are stored in [dasd] directory inside the TK4 folder structure. However, since the storage inside a docker container is not persistent, user DASD should be placed into the folder [dasd.usr] that is mounted as docker volume. 
 
-#### Creating and catagoling a new DASD
+#### Creating and catalog new DASD
 There are different DASD types that vary in capacity; typical models as 3330, 3340, 3350, 3380, 3390, etc. However, TK4- odes not support DASD models after 3350, thus we will be using the model 3350 which provides a capacity of approximately 300MB.
 
 MVS communicates to DASD devices through addresses. TK4- has assigned the following address ranges for DASD devices:
@@ -199,7 +199,11 @@ For the actual use of addresses refer to the **conf/tk4-.cnf** file
    To create a User catalog called **UCUSR000** that resides on the new volume **USR000** that will be connected to the master catalog, submit the following JCL:
 
    ```
-   //DEFUCAT JOB (*),CLASS=A,MSGLEVEL=(1,1),MSGCLASS=H              
+   //DEFUCAT JOB  (HERC02),
+   //             'Define User Catalog',
+   //             CLASS=A,
+   //             MSGLEVEL=(1,1),
+   //             MSGCLASS=H              
    //DEFUCAT EXEC PGM=IDCAMS,REGION=4096K                           
    //SYSPRINT DD SYSOUT=*                                           
    //USR000 DD UNIT=3350,VOL=SER=USR000,DISP=OLD                    
@@ -224,11 +228,45 @@ For the actual use of addresses refer to the **conf/tk4-.cnf** file
             RELATE (UCUSR000) )
    /*
    //
-   ```                                              
-   When a volume is brought into the system from a prior functioning system that has its own User Catalog on the volume, the following JCL is used to import that catalog and set up Aliases to it:
-
    ```
-   //ADDUCAT JOB (*),CLASS=S,MSGCLASS=H
+#### Connecting an existing volume to a system
+When a volume is brought into the system from a prior functioning system that has its own User Catalog on the volume, the volume must be attached, added to the MVS configuration, and the catalog connected to the master catalog
+
+1. Copy DASD file<br>
+   Copy the DASD file to /opt/tk4/dasd.usr directory, respectively run docker using `docker run --name tk4 -it --mount src=tk4-dasd,target=/opt/tk4/dasd.usr -p 3270:3270 -p 8038:8038 tk4:latest` with a docker volume that already contains the DASD files
+   
+2. Attach the DASD file mount the volume
+   - Attach DASD & mount it
+   Attach the DASE using the following command in the MVS console:
+   ```
+   attach 034a 3350 dasd.usr/usr000.34a
+   ```
+   Once the DASD is attach, set it online using `/v 34a,online` and mount it `/m 34a,vol=(sl,usr000),use=private`
+
+3. Modify the MVS configuration to automatically mount the DASD
+   - Edit MVS Configuration<br>
+     By modifying **SYS1.PARMLIB(VATLST00)** MVS will be instructed to automatically mount the volume, if accessible, and assign storage class 2 (Private)
+     ```
+     USR000,0,2,3350    ,N                  User Volume 1 
+     ```
+     <img width="636" alt="image" src="https://user-images.githubusercontent.com/43680256/229294781-e78fd5d8-e0f8-4d2e-8155-c4d65568ddcf.png">
+
+   - Edit Hercules Configuration<br>
+     Modify the file /opt/tk4/dasd.usr/usr_dasd.cnf to automatically attach the newly created dasd at address 34a. This file is referenced as include in the TK4- base configuration file (/opt/tk4/conf/tk4-.cnf)
+     ```
+     #
+     # User Added DASD
+     #
+     034a 3350 dasd.usr/usr000.34a
+     ```
+
+4. Import existing Catalog<br>
+   As the existing volume already contains a User Catalog it must be imported and connected to the master catalog using:
+   ```
+   //ADDUCAT JOB  (HERC02),
+   //             'Add existing User Catalog",
+   //             CLASS=S,
+   //             MSGCLASS=H
    //ADDUCAT EXEC PGM=IDCAMS,REGION=4096K
    //SYSPRINT DD  SYSOUT=*
    //SYSP01   DD  UNIT=3350,DISP=OLD,VOL=SER=USR000
