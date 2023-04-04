@@ -10,11 +10,6 @@
 #***                                                                ***
 #**********************************************************************
 #
-# set environment
-#
-export PATH=/opt/hercules/bin:$PATH
-export LD_LIBRARY_PATH=/opt/hercules/lib:/opt/hercules/lib/hercules:$LD_LIBRARY_PATH
-#
 # source configuration variables
 #
 if [ -f local_conf/tk4-.parm ]; then . local_conf/tk4-.parm; fi

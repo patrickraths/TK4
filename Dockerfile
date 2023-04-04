@@ -8,23 +8,15 @@
 #
 # Use Ubuntu container as foundation
 #
-FROM ubuntu:lunar
+FROM sdl-hercules-390:v4.5
 #
 # Set environment
 #
 ENV TK4 /opt/tk4
-ENV HERCULES /opt/hercules
-#
-# Install required packages
-#
-RUN apt-get -y update
-RUN apt-get -y install apt-utils wget time htop nano
-RUN apt-get -y install libcap2-bin
 #
 # Copy TK4- and Hercules 
 #
 COPY ./tk4      $TK4
-COPY ./hercules $HERCULES
 RUN mkdir -p $TK4/log $TK4/pch $TK4/prt $TK4/rdr $TK4/tapes $TK4/hercules
 #
 # Make Hercules web Interface available inside TK4- as reference by

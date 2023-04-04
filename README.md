@@ -1,51 +1,23 @@
-# MVS TK4- running in Docker container on AARCH64
+# MVS TK4- running in Docker container
 This repository contains all required files to build and run a docker container running **TK4-, Update 8** 
-
-## Components
+## Prerequisite
 Running TK4- Update 8 in a docker container requires serveral updates to the default configuration supplied as part of the default installation of TK4- as available on https://github.com/patrickraths/sdl-hercules-390-aarch64.git
 
-Both components, **SDL Hercules** and **TK4-** will be installed into the following directories:
-- /opt/hercules
-- /opt/tk4-
-
 ### SDL-Hercules 4.5
-The Hercules version embedded as part of TK4- does not current support AARCH64 architecture. To support this architecture Hercules has to be compiled from source. Compilinng and building the binaries and libraries for Hecules 4.5 is achieved using a different Docker container. For details refers to https://github.com/patrickraths/sdl-hercules-390-aarch64.git
+The Hercules version embedded as part of TK4- does not support AARCH64 architecture. To support this architecture Hercules has to be compiled from source. Compilinng and building the binaries and libraries for Hecules 4.5 is achieved using a different Docker container. For details refers to https://github.com/patrickraths/sdl-hercules-390-aarch64.git
 
 ### TK4-
-The following changes are requied to run TK4- with SDL Hercules 4.5
-
-- Remove embedded Hercules (multiple platform support)
-- Install SDL Hercules 4.5 for AARCH64
+The following changes were applied to the default TK4- Update 8 configuration as available on https://wotho.ethz.ch/tk4-/
+- Remove embedded Hercules
 - Remove all Windows related startup files
-- Remove Readme and Documentation files
 - Remove support to run Hercules in unattended (daemon) mode
 - Modifed startup files
 
-#### Change log of modification to TK4-
-| File/Directory | Changes |
-| :--- | :--- |
-| [conf] | Modifed tk4-.cnf to add support for user added DASD stored in Docker Volume and mounted as ./dasd.usr |
-| [ctca_demon] | no changes |
-| [dasd] | Added TK4- CBT DASD |
-| [doc] | Directory removed |
-| [hercules] | All files removed, but directory retained as it is reference in the configuration files for the hercules monitoring web interface. Sumbolic link for httproot subdirectory inside this directory will be created to access SDL Hercules 4.5 monitoring web interface. |
-| [jcl] | no changes |
-| [local_conf] | no changes |
-| [local_scripts] | no changes |
-| [log] | no changes |
-| [pch] | no changes |
-| [rdr] | no changes |
-| [scripts] | no changes |
-| [tapes] | no changes |
-| [unattended] | removed |
-| README_MVS*.txt | removed |
-| mvs.bat | removed |
-| start_herc.bat | removed |
-| mvs | modified |
-| startup_herc | modified |
-
 ## Building the Docker image and running it as container
 Building the container is controlled through the Dockerfile found in the root directory of this repository. To access the system using a 3270 Terminal Emulator as well as the SDL Hercules Web-Interface ports 3270 and 8038 must be made available on the host.
+### Building blocks
+- Dockerized SDL-Hercules-390 Version 4.5<br>
+  A dockerized version of SDL-Hercules-390 Version 4.5 (https://github.com/patrickraths/docker-SDL-Hercules-390) is used as the base image to build the TK4 docker image.
 
 - Build the image using `docker build -t tk4:latest .` This creates a new image called **TK4**
 - Create a volume called tk4-dasd. This volume can be used to store persistent dasd files.
@@ -61,10 +33,8 @@ docker start -i tk4
 
 
 ## Customizing TK4-
-
 ### Changing the Timezone
 To change the timezone modify **SYS1.PARMLIB(PARMTZ)**
-
 *†Syntax*<br>
 The member consists of one record
 The member uses the syntax  D,HH[.MM[.SS]]
