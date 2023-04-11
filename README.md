@@ -22,13 +22,7 @@ When running the container, hercules, the mainframe System/370 emulator, will be
 It is recommended to create separate DASDs (**D**irect **A**ccess **S**torage **D**evice) to store data on MVS that is not part of the standard TK4- configuration. While by default all DASD are stored in the directory /opt/tk4/dasd, user created DASD should be placed in **/opt/tk4/dasd.usr** which is configured as docker volume to allow for persistent storage. 
 
 Details on how to create additional DASD and configure MVS to use them can be found in the section **Customizing TK4-**
-### Downloading and running TK4 for the first time
-1. Download the docker image of the TK4 environment of your choice
-    - Default TK4 configuration
-    ```docker pull praths/tk4:latest```
-    - Rob Prins' TK4 with enhancements
-    ```docker pull praths/tk4:rob```
-2. Launch TK4-<br>
+
 To run TK4- in a container requires that the container is started with the correct options:<br>
 *--name tk4* assigns the name **tk4** to the container. If omitted, docker will be assign a random name. For the purpose of this documentation, the container is referred to as **tk4**<br>
 *--it* runs the container interactive and assigns a terminal (tty). This allows to access the hercules console not only through the web interface but directly in a terminal session. If this option is omitted, TK4- will be started an the hercules console can be accessed through the web interface on <http://localhost:8038>
