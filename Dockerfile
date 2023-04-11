@@ -1,20 +1,16 @@
-#**********************************************************************
-#***                                                                ***
-#*** Dockerfile:    TK4-, Update 8 running on Hercules 4.5          ***
-#***                                                                ***
-#*** Updated:       24 March 2023                                   ***
-#***                                                                ***
-#**********************************************************************
+# *********************************************************************
+# Run TK4- (MVS 3.8j) in Docker container
+# *********************************************************************
 #
-# Use Ubuntu container as foundation
+# Use SDL Hercules 4.5 as base container
 #
 FROM praths/sdl-hercules-390:latest
 #
 # Set environment
 #
-ENV TK4 /opt/tk4
+ENV TK4=/opt/tk4
 #
-# Copy TK4- and Hercules 
+# Copy TK4- and Hercules
 #
 COPY ./tk4      $TK4
 RUN mkdir -p $TK4/log $TK4/pch $TK4/prt $TK4/rdr $TK4/tapes $TK4/hercules
@@ -31,6 +27,6 @@ EXPOSE 8038/tcp
 #
 # Set working directory and define the default entrypoint into the
 # container to luanch TK4- when starting the container
-VOLUME /opt/tk4/dasd.usr
+VOLUME $TK4/dasd.usr
 WORKDIR $TK4
 ENTRYPOINT [ "./mvs" ]
