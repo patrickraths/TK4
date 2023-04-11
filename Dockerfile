@@ -8,7 +8,7 @@
 #
 # Use Ubuntu container as foundation
 #
-FROM sdl-hercules-390:v4.5
+FROM praths/sdl-hercules-390:latest
 #
 # Set environment
 #
@@ -31,5 +31,6 @@ EXPOSE 8038/tcp
 #
 # Set working directory and define the default entrypoint into the
 # container to luanch TK4- when starting the container
+VOLUME /opt/tk4/dasd.usr
 WORKDIR $TK4
 ENTRYPOINT [ "./mvs" ]
