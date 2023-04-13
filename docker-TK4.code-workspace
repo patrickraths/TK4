@@ -5,6 +5,7 @@
 		}
 	],
 	"settings": {
+		"docker.commands.build": "${containerCommand} build -f \"${dockerfile}\" -t ${tag} \"${context}\""
 	},
 	"launch": {
 		"version": "0.2.0",
