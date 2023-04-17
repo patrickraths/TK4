@@ -138,8 +138,10 @@ For the actual use of addresses refer to the **conf/tk4-.cnf** file
    <img width="564" alt="image" src="https://user-images.githubusercontent.com/43680256/229292813-f8b2b471-e8b8-4bad-ae3c-8aabebefaf3b.png">
 
 4. Set the volume online and mount it with the appropriate storage use class<br>
-   After the volume is initialized, it must be placed online before MVS will be able to allocate the volume to allow jobs to create datasets on it.  On the MVS console issue the command `v <address>,online`
-   
+   After the volume is initialized, it must be placed online before MVS will be able to allocate the volume to allow jobs to create datasets on it.  On the MVS console issue the command 
+   ```
+   /v <address>,online`
+   ```
    <img width="566" alt="image" src="https://user-images.githubusercontent.com/43680256/229293847-bbf79122-eec8-4ea6-b7eb-0a6f9cd8faa3.png">
 
    After the volume is set online it must be mounted.
