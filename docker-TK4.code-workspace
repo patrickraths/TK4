@@ -5,7 +5,9 @@
 		}
 	],
 	"settings": {
-		"docker.commands.build": "${containerCommand} build -f \"${dockerfile}\" -t ${tag} \"${context}\""
+		"docker.commands.build": "${containerCommand} build -f \"${dockerfile}\" -t ${tag} \"${context}\"",
+		"docker.commands.runInteractive": "${containerCommand} run --rm --cap-add=sys_nice -it ${exposedPorts} ${tag}",
+		"docker.commands.run": "${containerCommand} run --rm --cap-add=sys_nice -d ${exposedPorts} ${tag}"
 	},
 	"launch": {
 		"version": "0.2.0",

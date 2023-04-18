@@ -8,7 +8,8 @@ FROM praths/sdl-hercules-390:latest
 #
 # Set environment
 #
-ENV TK4=/opt/tk4
+ARG HERC=/opt/hercules
+ARG TK4=/opt/tk4
 #
 # Copy TK4- and Hercules
 #
