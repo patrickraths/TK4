@@ -13,7 +13,7 @@ ARG TK4=/opt/tk4
 #
 # Copy TK4- and Hercules
 #
-COPY ./tk4      $TK4
+COPY ./tk4 $TK4
 RUN mkdir -p $TK4/log $TK4/pch $TK4/prt $TK4/rdr $TK4/tapes $TK4/hercules
 #
 # Make Hercules web Interface available inside TK4- as reference by
