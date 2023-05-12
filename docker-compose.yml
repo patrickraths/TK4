@@ -1,0 +1,29 @@
+#
+# Define services
+#
+services:
+  tk4:
+    image: praths/tk4:latest
+    container_name: tk4
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    cap_add: 
+      - SYS_NICE
+    network_mode: bridge
+    ports: 
+      - 3270:3270
+      - 8038:8038
+    volumes:
+      - dasd:/opt/tk4/dasd
+      - dasd.usr:/opt/tk4/dasd.usr
+    restart: no
+
+volumes:
+  dasd:
+  dasd.usr:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/Users/praths/Documents/tk4/dasd.usr'
+
